@@ -9,6 +9,7 @@ namespace web.api.Model
     {
         public decimal period { get; set; }
         public string category { get; set; }
-      
+
+        public int clientId { get; set; }
     }
 }

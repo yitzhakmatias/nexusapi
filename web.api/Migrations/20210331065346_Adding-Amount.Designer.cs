@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using web.api.context;
 
 namespace web.api.Migrations
 {
     [DbContext(typeof(NexusContext))]
-    partial class NexusContextModelSnapshot : ModelSnapshot
+    [Migration("20210331065346_Adding-Amount")]
+    partial class AddingAmount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

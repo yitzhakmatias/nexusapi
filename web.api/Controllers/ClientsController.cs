@@ -29,7 +29,7 @@ namespace web.api.Controllers
             return await _context.Clients.ToListAsync();
         }
 
-       
+
         [HttpGet("pending")]
         public async Task<ActionResult<ClientDto>> GetClient([FromQuery] int clientId)
         {
@@ -47,15 +47,28 @@ namespace web.api.Controllers
         // PUT: api/Clients/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClient(int id, Client client)
+        [HttpPost("pay")]
+        public async Task<IActionResult> PutClient(ClientDto clientDto)
         {
-            if (id != client.Id)
+            var client = await _context.Clients.FindAsync(clientDto.ClientId);
+            if (!ClientExists(clientDto.ClientId))
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(client).State = EntityState.Modified;
+            var bills = _context.Bills.Where(p =>
+                p.Client.Id == clientDto.ClientId && p.Category == clientDto.Category);
+
+            foreach (var bill in bills)
+            {
+                bill.Client = client;
+                bill.Category = clientDto.Category;
+                bill.Period = DateTime.ParseExact(Convert.ToString(clientDto.Period, CultureInfo.InvariantCulture),
+                    "yyyyMM", CultureInfo.InvariantCulture);
+                bill.State = "Paid";
+                _context.Bills.Update(bill);
+            }
+
 
             try
             {
@@ -63,7 +76,7 @@ namespace web.api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(id))
+                if (!ClientExists(clientDto.ClientId))
                 {
                     return NotFound();
                 }
@@ -72,51 +85,30 @@ namespace web.api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            
+            return Ok();
         }
 
-        // POST: api/Clients
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Client>> PostClient(Client client)
-        {
-            _context.Clients.Add(client);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetClient", new { id = client.Id }, client);
-        }
         [HttpPost("bills")]
-        public async Task<ActionResult<BillDto>> PostBill(BillDto client)
+        public async Task<ActionResult> PostBill(BillDto billDto)
         {
-     
+            var client = await _context.Clients.FindAsync(billDto.clientId);
             var bill = new Bill()
             {
-                Category = client.category,
-                Period = DateTime.ParseExact(Convert.ToString(client.period, CultureInfo.InvariantCulture), "yyyyMM",CultureInfo.InvariantCulture)
-
+                Client = client,
+                Category = billDto.category,
+                Period = DateTime.ParseExact(Convert.ToString(billDto.period, CultureInfo.InvariantCulture), "yyyyMM",
+                    CultureInfo.InvariantCulture),
+                State = "Pending",
+                Amount = 100
             };
             _context.Bills.Add(bill);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostBill", new { id = bill.Id }, bill);
+            return Ok();
         }
-        // DELETE: api/Clients/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Client>> DeleteClient(int id)
-        {
-            var client = await _context.Clients.FindAsync(id);
-            if (client == null)
-            {
-                return NotFound();
-            }
 
-            _context.Clients.Remove(client);
-            await _context.SaveChangesAsync();
-
-            return client;
-        }
 
         private bool ClientExists(int id)
         {

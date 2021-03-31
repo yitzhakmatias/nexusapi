@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using web.api.context;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 
 namespace web.api
@@ -33,6 +33,10 @@ namespace web.api
        
            // services.AddDbContext<NexusContext>((s, o) => o.UseSqlite(@"Data Source=C:\nexus.db"));
             services.AddDbContext<NexusContext>(options => options.UseSqlite(Configuration.GetConnectionString("cs")));
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
             services.AddControllers();
         }
 

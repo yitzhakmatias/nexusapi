@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using web.api.context;
 
 namespace web.api.Migrations
 {
     [DbContext(typeof(NexusContext))]
-    partial class NexusContextModelSnapshot : ModelSnapshot
+    [Migration("20210331043115_Update-Db")]
+    partial class UpdateDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,9 +24,6 @@ namespace web.api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Category")
                         .HasColumnType("TEXT");
 
@@ -32,9 +31,6 @@ namespace web.api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Period")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("State")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

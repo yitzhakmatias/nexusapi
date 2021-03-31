@@ -24,8 +24,8 @@ namespace web.api.context
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Bill Bill { get; set; }
 
+        public List<Bill> Bills { get; } = new List<Bill>();
     }
 
     public class Bill
@@ -33,10 +33,12 @@ namespace web.api.context
         public int Id { get; set; }
         public string Category { get; set; }
         public DateTime Period { get; set; }
-    
+        public string State { get; set; }
+        public decimal Amount { get; set; }
 
         public int ClientId { get; set; }
  
-        public List<Client> Clients { get; } = new List<Client>();
+       
+        public Client Client { get; set; }
     }
 }
