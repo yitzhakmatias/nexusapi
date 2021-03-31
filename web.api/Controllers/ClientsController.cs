@@ -31,19 +31,45 @@ namespace web.api.Controllers
 
 
         [HttpGet("pending")]
-        public async Task<ActionResult<ClientDto>> GetClient([FromQuery] int clientId)
+        public async Task<ActionResult<IEnumerable<BillDto>>> GetClient([FromQuery] int clientId)
         {
-            var client = await _context.Clients.FindAsync(clientId);
+            var bills =  _context.Bills.Where(p => p.State.Contains( "Pending") && p.ClientId == clientId);
 
 
-            if (client == null)
+
+            var billDtoList = new List<BillDto>();
+            foreach (var bill in bills)
             {
-                return NotFound();
+                billDtoList.Add(new BillDto()
+                {
+                    category = bill.Category,
+                    period = decimal.Parse(bill.Period.ToString("yyyyMM"), CultureInfo.InvariantCulture),
+                    clientId = bill.ClientId
+                });
             }
 
-            return null;
-        }
 
+            return Ok(billDtoList);
+        }
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<BillDto>>> SearchBill([FromQuery] string category)
+        {
+            var billing =  _context.Bills.Where(p => p.Category == category);
+
+            var billDtoList = new List<BillDto>();
+            foreach (var bill in billing)
+            {
+                billDtoList.Add(new BillDto()
+                {
+                    category = bill.Category,
+                    period = decimal.Parse(bill.Period.ToString("yyyyMM"), CultureInfo.InvariantCulture) ,
+                    clientId = bill.ClientId
+                });
+            }
+
+
+            return Ok(billDtoList);
+        }
         // PUT: api/Clients/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
